@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+</head>
+<body>
+
+    {% block nav %}
+        <section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+                            <li>{% block nav-index%}<a href = "{%url 'reg_index'%}"> Главная </a>{% endblock %}</li>
+                            <li>{% block nav-add_player %}<a href = "{%url 'add_player'%}"> Добавить игрока </a>{% endblock %}</li>
+                            <li>{% block nav-team%}<a href = "{%url 'list_team'%}"> Наша команда </a>{% endblock %}</li>
+                            <li>{% block nav-export%}<a href = "{%url 'team_export'%}"> Выгрузка данных </a>{% endblock %}</li>
+						</ul>
+					</nav>
+				</div>
+        </section>
+    {% endblock %}
+
+    {% block main%}
+
+    {% endblock %}
+
+    <div class="footer">
+        <div class="section-inner clearfix">
+            <p>&copy; Пиу-Пиу</p>
+        </div>
+    </div>
+
+</body>
+</html>

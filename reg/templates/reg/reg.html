@@ -1,0 +1,21 @@
+{% extends "reg/base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block nav-team%}<strong class="nav-active"> Наша команда </strong>{% endblock %}
+
+{% block title %} Team {% endblock %}
+
+{% block main%}
+    <h3>Поле</h3>
+    <Body>
+        {% render_table field %}
+    </Body>
+    <h3>Штаб</h3>
+    <Body>
+        {% render_table headquarters %}
+    </Body>
+    <h3>Не записались </h3>
+    <Body>
+    {% render_table non_registered %}
+    </Body>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "reg/base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block nav-export%}<strong class="nav-active"> Выгрузка данных </strong>{% endblock %}
+
+{% block title %} Выгрузка таблицы {% endblock %}
+
+{% block main%}
+<Body>
+{% render_table table %}
+</Body>
+
+<h3>Скачать таблицу как: </h3>
+<a target="_blank"
+    class="btn btn-info pull-right"
+    href="{% url 'team_export' %}?_export=csv">
+    CSV
+</a>
+
+<a target="_blank"
+   class="btn btn-info pull-right"
+   href="{% url 'team_export' %}?_export=tsv">
+    TSV
+</a>
+
+{% endblock %}

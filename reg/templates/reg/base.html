@@ -16,10 +16,17 @@
                             <li>{% block nav-add_player %}<a href = "{%url 'add_player'%}"> Добавить игрока </a>{% endblock %}</li>
                             <li>{% block nav-team%}<a href = "{%url 'list_team'%}"> Наша команда </a>{% endblock %}</li>
                             <li>{% block nav-export%}<a href = "{%url 'team_export'%}"> Выгрузка данных </a>{% endblock %}</li>
+                            {% if user.is_authenticated %}
+                            <li>{% block nav-logged_in%}<a href = "{%url 'list_team'%}"> Добро пожаловать: {{user.get_username}} </a>{% endblock %}</li>
+                            <li>{% block nav-logout%}<a href = "{%url 'logout'%}"> Выйти </a>{% endblock %}</li>
+                            {% endif %}
 						</ul>
 					</nav>
 				</div>
         </section>
+    {% endblock %}
+
+    {% block content %}
     {% endblock %}
 
     {% block main%}

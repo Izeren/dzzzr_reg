@@ -8,6 +8,11 @@ Main Reg Page
 
 {% block main %}
 
+It is template to render redirect Telegram widget!
+
+<!-- {{ telegram_login_widget|safe }} -->
+{% autoescape off %}{{ telegram_login_widget }}{% endautoescape %}
+
 <h3>Добро пожаловать на регу команды Пиу-Пиу</h3>
 <body>
 Этот сайт сделан для регистрации игроков на игру внутри команды. Он нужен, чтобы упростить процедуру

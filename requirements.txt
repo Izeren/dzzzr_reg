@@ -1,0 +1,5 @@
+django
+django-tables2
+tablib
+django-telegram-login
+raven

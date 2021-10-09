@@ -20,6 +20,7 @@ from reg import views
 urlpatterns = [
     path('reg/', views.index, name='reg_index'),
     path('team/', views.list_team, name='list_team'),
+    path('tlogin/', views.telegram_login, name='telegram_login'),
     path('add_player/', views.add_player, name='add_player'),
     path('export', views.team_export, name='team_export'),
     path('edit/<str:pk>', views.edit_player, name='edit_player'),

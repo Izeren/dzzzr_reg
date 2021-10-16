@@ -1,10 +1,11 @@
 from enum import Enum
 
+from django.contrib.auth.models import User
 from django.db import models
 
 from reg import MAX_NAME_LENGTH, MAX_PLAYER_NOTES_LENGTH, MAX_PHONE_LENGTH, COMMENT_HELP_TEXT, NAME_REF, ROLE_REF, \
     DANGER_CODE_REF, NOTES_REF, PHONE_REF, FLASHLIGHT_REF, HEADLIGHT_REF, UV_REF, RADIO_REF, LAPTOP_REF, \
-    PHONE_HELP_TEXT, NICK_REF, DRIVER_REF, CAR_REF, CHARGER_REF, LEVEL_REF
+    PHONE_HELP_TEXT, NICK_REF, DRIVER_REF, CAR_REF, CHARGER_REF, LEVEL_REF, GAME_NAME_REF
 
 
 class ChoiceableEnum(Enum):
@@ -57,16 +58,22 @@ class DriverType(ChoiceableEnum):
     CARSHARING = "каршеринг"
 
 
+class Game(models.Model):
+    game_id = models.AutoField(primary_key=True)
+    game_name = models.CharField(verbose_name=GAME_NAME_REF, max_length=MAX_NAME_LENGTH)
+
+
 class Player(models.Model):
+    player_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, models.CASCADE)
     name = models.CharField(verbose_name=NAME_REF, max_length=MAX_NAME_LENGTH)
-    nick = models.CharField(verbose_name=NICK_REF, max_length=MAX_NAME_LENGTH, unique=True)
+    nick = models.CharField(verbose_name=NICK_REF, max_length=MAX_NAME_LENGTH)
     role = models.CharField(verbose_name=ROLE_REF, max_length=PlayerType.get_max_name_length(),
                             choices=PlayerType.choices(), default=PlayerType.NOT_PLAYING)
     danger_code = models.CharField(verbose_name=DANGER_CODE_REF, max_length=LabelDangerCode.get_max_name_length(),
                                    choices=LabelDangerCode.choices(), default=LabelDangerCode.OMG)
     notes = models.CharField(verbose_name=NOTES_REF, max_length=MAX_PLAYER_NOTES_LENGTH, help_text=COMMENT_HELP_TEXT,
                              null=True, blank=True)
-    phone = models.CharField(verbose_name=PHONE_REF, max_length=MAX_PHONE_LENGTH, help_text=PHONE_HELP_TEXT)
     flashlight = models.BooleanField(verbose_name=FLASHLIGHT_REF, default=False)
     headlight = models.BooleanField(verbose_name=HEADLIGHT_REF, default=False)
     uv_light = models.BooleanField(verbose_name=UV_REF, default=False)
@@ -81,5 +88,7 @@ class Player(models.Model):
                              choices=Level.choices(), default=Level.NOVICE)
 
 
-
-
+class Participation(models.Model):
+    record_id = models.AutoField(primary_key=True)
+    game_id = models.ForeignKey(Game, models.CASCADE)
+    player_id = models.ForeignKey(Player, models.CASCADE)

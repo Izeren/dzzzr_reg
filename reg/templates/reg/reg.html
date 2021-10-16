@@ -6,16 +6,8 @@
 {% block title %} Team {% endblock %}
 
 {% block main%}
-    <h3>Поле</h3>
+    <h3>Все игроки</h3>
     <Body>
-        {% render_table field %}
-    </Body>
-    <h3>Штаб</h3>
-    <Body>
-        {% render_table headquarters %}
-    </Body>
-    <h3>Не записались </h3>
-    <Body>
-    {% render_table non_registered %}
+    {% render_table all %}
     </Body>
 {% endblock %}

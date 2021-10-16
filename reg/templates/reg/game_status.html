@@ -1,0 +1,21 @@
+{% extends "reg/base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block nav-game_status%}<strong class="nav-active"> Текущая игра </strong>{% endblock %}
+
+{% block title %} Team {% endblock %}
+
+{% block main%}
+    <h3>Поле</h3>
+    <Body>
+        {% render_table registered_field %}
+    </Body>
+    <h3>Штаб</h3>
+    <Body>
+        {% render_table registered_headquarters %}
+    </Body>
+    <h3>Не записались </h3>
+    <Body>
+    {% render_table reserve%}
+    </Body>
+{% endblock %}

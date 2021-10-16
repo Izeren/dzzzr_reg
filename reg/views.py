@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 from django import template
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -13,9 +14,10 @@ from django_telegram_login.widgets.constants import SMALL, LARGE, DISABLE_USER_P
 from django_telegram_login.widgets.generator import create_callback_login_widget, create_redirect_login_widget
 from django.conf import settings
 
-from reg.forms import NewPlayerForm
-from reg.models import Player, PlayerType
-from reg.tables import FieldPlayerTable, HeadQuartersPlayerTable, NonRegisteredPlayerTable, ExportPlayersTable
+from reg.forms import NewPlayerForm, NewGameForm
+from reg.models import Player, PlayerType, Game, Participation
+from reg.tables import HeadQuartersPlayerTable, NonRegisteredPlayerTable, ExportPlayersTable, \
+    GamesListTable, RegisteredPlayers, RegisteredFieldPlayerTable
 
 
 @xframe_options_exempt
@@ -34,7 +36,7 @@ def telegram_login(request):
     return HttpResponse(t.render(c))
 
 
-@login_required
+@staff_member_required
 def add_player(request):
     if request.method == "POST":
         f = NewPlayerForm(request.POST)
@@ -46,12 +48,77 @@ def add_player(request):
     return render(request, 'reg/add_player.html', {'form': f})
 
 
+@staff_member_required
+def new_game(request):
+    if request.method == "POST":
+        f = NewGameForm(request.POST)
+        game_exist = len(Game.objects.all().filter(game_name=f.data.get("game_name"))) > 0
+        if not game_exist and f.is_valid():
+            f.save()
+            return redirect('list_games')
+    else:
+        f = NewGameForm()
+    return render(request, 'reg/add_game.html', {'form': f})
+
+
+@staff_member_required
+def delete_game(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    game.delete()
+    return redirect(reverse("list_games"))
+
+
+@staff_member_required
+def delete_user(request, pk):
+    player = get_object_or_404(Player, pk=pk)
+    player.delete()
+    return redirect(reverse("list_team"))
+
+
+@login_required
+def register_to_game(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    player = get_object_or_404(Player, pk=request.user.id)
+    participations = Participation.objects.all().filter(game_id=game, player_id=player)
+    if not len(participations):
+        participation = Participation(game_id=game, player_id=player)
+        participation.save()
+    return redirect(reverse("list_team"))
+
+
+@login_required
+def unregister_from_game(request, pk):
+    participation = get_object_or_404(Participation, pk=pk)
+    participation.delete()
+    return redirect(reverse("list_team"))
+
+
 @login_required
 def list_team(request):
     return render(request, 'reg/reg.html', {
-        'field': FieldPlayerTable(Player.objects.all().filter(role=PlayerType.FIELD.name)),
-        'headquarters': HeadQuartersPlayerTable(Player.objects.all().filter(role=PlayerType.HEADQUARTERS.name)),
-        'non_registered': NonRegisteredPlayerTable(Player.objects.all().filter(role=PlayerType.NOT_PLAYING.name))
+        'all': RegisteredPlayers(Player.objects.all()),
+    })
+
+
+@login_required
+def game_status(request, pk):
+    return render(request, 'reg/game_status.html', {
+        'registered_field': RegisteredFieldPlayerTable(Participation.objects.all()
+                                                       .filter(game_id=pk)
+                                                       .filter(player_id__role=PlayerType.FIELD.name)),
+        'registered_headquarters': HeadQuartersPlayerTable(Participation.objects.all()
+                                                           .filter(game_id=pk)
+                                                           .filter(player_id__role=PlayerType.HEADQUARTERS.name)),
+        'reserve': NonRegisteredPlayerTable(Participation.objects.all()
+                                            .filter(game_id=pk)
+                                            .filter(player_id__role=PlayerType.NOT_PLAYING.name)),
+    })
+
+
+@login_required
+def list_games(request):
+    return render(request, 'reg/games.html', {
+        'games': GamesListTable(Game.objects.all()),
     })
 
 
@@ -73,8 +140,10 @@ def edit_player(request, pk):
             return redirect(reverse('list_team'))
 
     # if request is GET the show unbound form to the user, along with data
-    else:
+    elif player.user_id == request.user:
         f = NewPlayerForm(instance=player)
+    else:
+        return redirect(reverse("list_team"))
 
     return render(request, 'reg/edit_player.html', {'form': f, 'post': player})
 
